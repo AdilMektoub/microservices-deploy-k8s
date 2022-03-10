@@ -1,0 +1,46 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  # master1
+  config.vm.define "master1" do |master1|
+    master1.vm.box = "debian/bullseye64"
+    master1.vm.box_download_insecure = true
+    master1.vm.hostname = "master1"
+    master1.vm.box_url = "debian/bullseye64"
+    master1.vm.network :private_network, ip: "172.16.16.100"
+    master1.vm.provider :virtualbox do |v|
+      v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+      v.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+      v.customize ["modifyvm", :id, "--memory", 2048]
+      v.customize ["modifyvm", :id, "--name", "master1"]
+      v.customize ["modifyvm", :id, "--cpus", "2"]
+    end
+    config.vm.provision "shell", inline: <<-SHELL
+      sed -i 's/ChallengeResponseAuthentication no/ChallengeResponseAuthentication yes/g' /etc/ssh/sshd_config
+      service ssh restart
+    SHELL
+    master1.vm.provision "shell", path: "common.sh"
+  end
+
+  # worker1
+  config.vm.define "worker1" do |worker1|
+    worker1.vm.box = "debian/bullseye64"
+    worker1.vm.box_download_insecure = true
+    worker1.vm.hostname = "worker1"
+    worker1.vm.box_url = "debian/bullseye64"
+    worker1.vm.network :private_network, ip: "172.16.16.101"
+    worker1.vm.provider :virtualbox do |v|
+      v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+      v.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+      v.customize ["modifyvm", :id, "--memory", 1024]
+      v.customize ["modifyvm", :id, "--name", "worker1"]
+      v.customize ["modifyvm", :id, "--cpus", "2"]
+    end
+    config.vm.provision "shell", inline: <<-SHELL
+      sed -i 's/ChallengeResponseAuthentication no/ChallengeResponseAuthentication yes/g' /etc/ssh/sshd_config
+      service ssh restart
+    SHELL
+    worker1.vm.provision "shell", path: "common.sh"
+  end
+end

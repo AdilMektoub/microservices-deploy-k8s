@@ -1,0 +1,16 @@
+k8s:
+Redondance: Replication de DB
+gestion de resource
+Scalabilite redirige le trafic vers les conteneurs qui ont des resources dispo
+quelle docker a un probleme (sante des dockers)
+zero-downtime (client s'appercoie de rien) ROLLBACK (RESTAURER UNE NOUVELLE CONFIGF)
+Loadbalancer redirige le trafic charger
+ACL: gestion de droit sur k8s,
+Secret management: deployment continue
+Multi cloud en cas d'incendit il ne faut pas tout dans le meme provider avec des instance dans des regions differentes
+Le job:
+	Maintien l'infra cloud provider sysAdmin
+	Gestion de l'infra (k8s, docker)
+	Developer travailler sur les apps
+
+Statefulset DB 

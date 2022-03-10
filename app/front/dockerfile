@@ -1,0 +1,20 @@
+# Stage 1
+FROM node:8.9.4
+
+RUN mkdir -p /app
+
+WORKDIR /app
+
+COPY tsconfig.json /app/
+COPY package.json /app/
+COPY angular.json /app/
+COPY tslint.json /app/
+
+RUN apt-get update && apt-get install -y curl
+
+RUN yarn install
+
+COPY . /app
+
+RUN yarn build
+RUN yarn start &

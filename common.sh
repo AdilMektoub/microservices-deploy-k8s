@@ -26,3 +26,7 @@ echo "
 " >/etc/docker/daemon.json
 systemctl daemon-reload
 systemctl restart docker
+
+echo "[5]: add hosts"
+sudo -u vagrant echo "172.16.16.100  kmaster.com master1" >> /etc/hosts
+sudo -u vagrant echo "172.16.16.101  kworker.com worker1" >> /etc/hosts

@@ -1,0 +1,13 @@
+version: '3.3'
+
+services:
+  front:
+    build: ./front
+    ports:
+      - 80:80
+    networks:
+      - front
+
+networks:
+  front:
+    driver: bridge

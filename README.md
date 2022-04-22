@@ -1,2 +1,2 @@
 docker-compose build app
-docker-compose up -d
+docker-compose up --build -d

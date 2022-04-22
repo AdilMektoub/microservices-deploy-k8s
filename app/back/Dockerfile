@@ -1,34 +1,56 @@
-FROM php:7.4-fpm
+# stage 1
+FROM node:latest AS node
+RUN echo "NODE Version:" && node --version
+RUN echo "NPM Version:" && npm --version
 
-# Arguments defined in docker-compose.yml
-ARG user
-ARG uid
+# stage 2
+FROM php:5.6-apache
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     git \
+    git-core \
     curl \
+    build-essential \
+    openssl \
+    libssl-dev \
     libpng-dev \
     libonig-dev \
-    libxml2-dev \
-    zip \
-    unzip
+    libxml2-dev
 
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+# Install php-xml php-curl
+RUN docker-php-ext-install -j$(nproc) xmlrpc
 
-# Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+# Save project in container
+COPY . ./app
 
-# Get latest Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+WORKDIR /app
 
-# Create system user to run Composer and Artisan Commands
-RUN useradd -G www-data,root -u $uid -d /home/$user $user
-RUN mkdir -p /home/$user/.composer && \
-    chown -R $user:$user /home/$user
+# Clear cache apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
-WORKDIR /var/www
+# Before Install composer
+# RUN apt-get update && apt-get install -y libmcrypt-dev \
+#     mysql-client libmagickwand-dev --no-install-recommends \
+#     && pecl install imagick \
+#     && docker-php-ext-enable imagick \
+# && docker-php-ext-install mcrypt pdo_mysql
 
-USER $user
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN composer
+
+# try have node for npm
+COPY --from=node_base . .
+
+# Install node for npm
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get install -y nodejs \
+    npm
+
+# Install dependance of javascript
+RUN npm install
+
+# Install packages for laravel with laravel
+RUN ./composer.phar update
+
+CMD [ "php artisan serve" ]

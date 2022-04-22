@@ -1,111 +1,54 @@
-version: '3.3'
+version: '3'
 
-# network for front and back(laravel)
 networks:
   app:
     driver: bridge
 
 services:
-  # last created is front
-  front:
-    container_name: front
-    build: ./front
-    ports:
-      - 80:80
-    networks:
-      - app
-    depends_on:
-      - nginx
-      - mysql
-      - elasticsearch
-      - rabbitmq
-      - php
-
   php:
     build:
-      args:
-        user: sammy
-        uid: 1000
       context: ./back/
       dockerfile: Dockerfile
     container_name: php
-    working_dir: /var/www/
     volumes:
-      - ./:/var/www
+      - ./back:/back
     ports:
       - "9000:9000"
     depends_on:
       - mysql
-      - elasticsearch
-      - rabbitmq
-      - nginx
     networks:
       - app
 
   nginx:
-    image: nginx:stable-alpine
+    image: nginx:latest
     container_name: nginx
     ports:
-    - "8081:80"
+    - "8080:80"
     volumes:
-      - ./:/var/www
-      - ./back/nginx:/etc/nginx/conf.d/
-    depends_on:
-      - mysql
-      - elasticsearch
-      - rabbitmq
+      - ./conf/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./back:/back
     networks:
       - app
 
   mysql:
-    image: mysql:5.7.22
+    image: mysql:latest
     container_name: mysql
     restart: unless-stopped
-    tty: true
     ports: 
-      - "3307:3306"
+      - "33601:3306"
     volumes:
-      - ./back/database/mysql:var/lib/mysql
+      - ./mysql:/var/lib/mysql
+      - ./conf/my.cnf:/etc/mysql/my.cnf
     env_file:
       - ./back/.env
     environment:
+      MYSQL_ROOT_PASSWORD: $${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: $${MYSQL_USER}
+      MYSQL_PASSWORD: $${MYSQL_PASSWORD}
+      # ces variable m'empeche de me connecter a la base de donnee
       DB_CONNECTION: $${DB_CONNECTION}
-      DB_HOST: $${DB_HOST}
-      DB_PORT: $${DB_PORT}
       DB_DATABASE: $${DB_DATABASE}
       DB_USERNAME: $${DB_USERNAME}
       DB_PASSWORD: $${DB_PASSWORD}
-      SERVICE_TAGS: dev
-      SERVICE_NAME: mysql
-    networks:
-      - app
-
-  elasticsearch:
-    container_name: elasticsearch
-    image: elasticsearch:7.9.0
-    restart: unless-stopped
-    env_file:
-      - ./back/.env
-    environment:
-      ELASTICSEARCH_URI: $${ELASTICSEARCH_URI}
-    networks:
-      - app
-
-  rabbitmq:
-    container_name: rabbitmq
-    image: rabbitmq:latest
-    restart: unless-stopped
-    volumes:
-      - ./back/database/rabbitmq:var/lib/rabbitmq
-    env_file:
-      - ./back/.env
-    environment:
-      RABBITMQ_HOST: $${RABBITMQ_HOST}
-      RABBITMQ_PORT: $${RABBITMQ_PORT}
-      RABBITMQ_USER: $${RABBITMQ_USER}
-      RABBITMQ_PASSWORD: $${RABBITMQ_PASSWORD}
-      RABBITMQ_VHOST: $${RABBITMQ_VHOST}
-    ports:
-      - 15672:15672
     networks:
       - app

@@ -7,15 +7,16 @@ networks:
 services:
   php:
     build:
-      context: ./back/
+      args:
+        user: adil
+        uid: 1000
+      context: ./back
       dockerfile: Dockerfile
-    container_name: php
+    container_name: back
+    restart: unless-stopped
+    working_dir: /var/www/
     volumes:
-      - ./back:/back
-    ports:
-      - "9000:9000"
-    depends_on:
-      - mysql
+      - ./:/var/www
     networks:
       - app
 

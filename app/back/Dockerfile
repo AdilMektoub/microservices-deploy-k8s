@@ -37,18 +37,16 @@ WORKDIR /app
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-RUN composer
 
-# try have node for npm
-COPY --from=node_base . .
 
-# Install node for npm
-RUN apt-get update && apt-get upgrade -y && \
-    apt-get install -y nodejs \
-    npm
+# # try have node for npm
+# COPY --from=node . /usr/share/nginx/html
 
-# Install dependance of javascript
-RUN npm install
+# # Install node for npm
+# RUN apt-get update && npm
+
+# # Install dependance of javascript
+# RUN npm install
 
 # Install packages for laravel with laravel
 RUN ./composer.phar update

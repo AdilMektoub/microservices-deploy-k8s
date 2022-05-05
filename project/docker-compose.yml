@@ -10,6 +10,8 @@ services:
     build: ./front
     ports:
       - 80:80
+    links:
+      - fpm # "Failed to request backend"
     networks:
       - laravel
     depends_on:
@@ -18,6 +20,7 @@ services:
       - fpm
 
   nginx:
+    container_name: nginx
     build:
       context: .
       dockerfile: docker/nginx.dockerfile
@@ -31,6 +34,7 @@ services:
       - laravel
 
   fpm:
+    container_name: fpm
     build:
       context: .
       dockerfile: docker/fpm.dockerfile
@@ -42,6 +46,7 @@ services:
       - laravel
 
   mysql:
+    container_name: mysql
     image: mysql:5.7
     ports:
       - 3306:3306

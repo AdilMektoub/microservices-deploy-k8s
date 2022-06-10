@@ -2,6 +2,7 @@ version: '3.9'
 
 networks:
   laravel:
+    driver: bridge
 
 services:
 # last created is front
@@ -12,43 +13,32 @@ services:
       - 80:80
     networks:
       - laravel
-    depends_on:
-      - nginx
-      - mysql
-      - fpm
-
-  nginx:
-    build:
-      context: .
-      dockerfile: docker/nginx.dockerfile
-    ports:
-      - 8098:80
-    volumes:
-      - ./:/var/www/html
-    links:
-      - fpm
-    networks:
-      - laravel
 
   fpm:
+    container_name: fpm
+    env_file:
+      - "./.env"
     build:
-      context: .
+      context: ./
       dockerfile: docker/fpm.dockerfile
-    volumes:
-      - ./:/var/www/html
+    ports:
+      - 8000:8000
     links:
       - db
     networks:
       - laravel
 
-  mysql:
+  db:
+    container_name: db
     image: mysql:5.7
+    env_file:
+      - "./.env"
     ports:
       - 3306:3306
     environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_USER=user
-      - MYSQL_PASSWORD=password
-      - MYSQL_DATABASE=bdlaravel
+      MYSQL_ROOT_PASSWORD: $${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: $${MYSQL_USER}
+      MYSQL_PASSWORD: $${MYSQL_PASSWORD}
+      MYSQL_DATABASE: $${MYSQL_DATABASE}
     networks:
       - laravel

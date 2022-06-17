@@ -55,9 +55,25 @@ services:
       - front
       - back
 
+  rabbitmq:
+    build:
+      context: .
+      dockerfile: docker/rabbitMQ.dockerfile
+    env_file:
+      - "./.env"
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - messaging
+      - back
+
 networks:
   front:
     driver: bridge
   back:
+  messaging:
+      driver: bridge
 volumes:
   mysql_data: { driver: local }

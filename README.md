@@ -23,3 +23,8 @@ docker exec -it fpm /bin/bash
 ```
 php artisan migrate
 ```
+
+## Liens dispo après lancement des conteneurs
+* [Frontend](http://localhost/)
+* [Backend](http://localhost:8000/)
+* [RabbitMQ](http://localhost:15672)

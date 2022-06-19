@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: front
-  namespace: prod
   labels:
     app: front
 spec:
@@ -18,15 +17,7 @@ spec:
       containers:
         - name: front
           image: adilmektoub06/kubi_front
+          imagePullPolicy: Always
           ports:
             - name: http
               containerPort: 80
-              protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http

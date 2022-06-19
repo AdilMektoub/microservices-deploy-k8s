@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: fpm
-  namespace: prod
   labels:
     app: fpm
 spec:
